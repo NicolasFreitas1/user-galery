@@ -1,3 +1,3 @@
-#Projeto  User galery
+## Projeto  User galery
 
-## Projeto utilizando a API imageAPI
+### Projeto utilizando a API imageAPI
