@@ -2,11 +2,15 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    
 }
 
-body, input, button {
+body, input, button, p {
     font-size: 16px;
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Montserrat', sans-serif;
 
     -webkit-font-smoothing: antialiased;
+}
+a {
+    text-decoration: none;
 }
