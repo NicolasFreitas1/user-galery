@@ -6,13 +6,20 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Container } from './styles'
 
 import teste111 from "../login/assets/teste111.jpg"
+import { AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter } from '@chakra-ui/modal';
+import { Button, useDisclosure } from '@chakra-ui/react';
 
 export function Register() {
+    const { isOpen, onOpen, onClose } = useDisclosure()
+    const cancelRef = React.useRef()
+    
     const navigate = useNavigate();
 
     const [name, setName] = useState('');
     const [login, setLogin] = useState('');
     const [password, setPassword] = useState('');
+    const [showError, setShowError] = useState('');
+    const errorFixed = showError.replace(/"/g, '')
 
    
 
@@ -30,12 +37,14 @@ export function Register() {
             localStorage.setItem('id', JSON.stringify(data.id));
             console.log(data)
             const token = localStorage.getItem('token');
+            api.defaults.headers.authorization = `Bearer ${token}`;
             console.log(token)
             navigate("/home");
         }
         catch (error: any) {
-            alert(JSON.stringify((error.response.data.message)));
+            setShowError(JSON.stringify((error.response.data.message)));
             console.log(JSON.stringify((error.response.data.message)));
+            onOpen();
 
         }
 
@@ -58,23 +67,48 @@ export function Register() {
                             
                         />
                         <input
+                            required
                             type="text"
                             placeholder='Digite seu usuário'
                             onChange={e => setLogin(e.target.value)} 
-                            required
+                            
                             
                         />
                         <input
+                            required
                             type="password"
                             placeholder='Digite sua senha'
                             onChange={e => setPassword(e.target.value)}
-                            required
+                            
                         />
-
+                       
                         <button type="submit" onClick={handleLogin}>Acessar a plataforma</button>
                         <Link to="/" className="Text">Já possui uma conta? Faça login</Link>
                     </fieldset>
                 </form>
+                <AlertDialog
+                    isOpen={isOpen}
+                    leastDestructiveRef={cancelRef}
+                    onClose={onClose}
+                >
+                    <AlertDialogOverlay>
+                        <AlertDialogContent>
+                            <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                                Erro
+                            </AlertDialogHeader>
+
+                            <AlertDialogBody>
+                                {errorFixed}
+                            </AlertDialogBody>
+
+                            <AlertDialogFooter>
+                                <Button colorScheme='red' onClick={onClose} ml={3}>
+                                    Fechar
+                                </Button>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialogOverlay>
+                </AlertDialog>
                 
                 </div>
         </Container>

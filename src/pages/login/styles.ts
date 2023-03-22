@@ -19,18 +19,19 @@ export const Container = styled.div`
         color: #fff;
 
         border-radius: 5px;
-        margin: 12px 0 84px;
+        margin: 12px 0 50px;
         border: none;
 
         cursor: pointer;
-        transition: filter 0.5s;
+        transition: 0.5s;
 
         font-size: 16px;
 
-    }
-    bottom:hover {
-    
     };
+    button:hover {
+        background-color: #007DDC;
+    };
+   
     fieldset {
         padding: 24px;
         margin-left: 25%;    
@@ -54,16 +55,34 @@ export const Container = styled.div`
         border: none;
         margin-bottom: 5%;
         font-size: 16px;
+    };
+
+        
+    p{
+        align-self: center;
+        color: red;
+        align-items: center;
+        font-size: 16px;
+        font-weight: 700;
+        text-decoration: none;
+        font-family: 'Roboto', sans-serif;
+        padding-bottom: 12px;
+        -webkit-font-smoothing: antialiased;
     }
     .Text {
-        margin-left: 20%;
-        align-items: center;
+        color: #202020;
+        align-self: center;
         font-size: 16px;
         font-weight: 700;
         text-decoration: none;
         font-family: 'Roboto', sans-serif;
 
         -webkit-font-smoothing: antialiased;
+        transition: 0.5s;
+    };
+
+    .Text:hover{
+        color: #551A8B;
     };
     .DivImg {
         height: 100%;

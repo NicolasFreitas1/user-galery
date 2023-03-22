@@ -4,15 +4,26 @@ import api from '../../services/api';
 import { Link, useNavigate } from 'react-router-dom';
 
 import {Container} from './styles'
-
-import teste111 from "../login/assets/teste111.jpg"
+import {
+    AlertDialog,
+    AlertDialogBody,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogContent,
+    AlertDialogOverlay,
+    Button,
+    useDisclosure,
+  } from '@chakra-ui/react'
 
 export function Login() {
+    const { isOpen, onOpen, onClose } = useDisclosure()
+    const cancelRef = React.useRef()
     const navigate = useNavigate();
 
     const [login, setLogin] = useState('');
     const [password, setPassword] = useState('');
-
+    const [showError, setShowError] = useState('');
+    const errorFixed = showError.replace(/"/g, '')
    
 
     async function handleLogin(event: any) {
@@ -33,8 +44,9 @@ export function Login() {
             navigate("/home");
         }
         catch (error: any) {
-            alert(JSON.stringify((error.response.data.message)));
+            setShowError(JSON.stringify((error.response.data.message)));
             console.log(JSON.stringify((error.response.data.message)));
+            onOpen();
 
         }
 
@@ -61,12 +73,36 @@ export function Login() {
                             onChange={e => setPassword(e.target.value)}
                             required
                         />
-
+                        
                         <button type="submit" onClick={handleLogin}>Acessar a plataforma</button>
                         <Link to="/register" className="Text">Não possui uma conta? Registrar-se</Link>
                     </fieldset>
                 </form>
-                
+        
+                <AlertDialog
+                    isOpen={isOpen}
+                    leastDestructiveRef={cancelRef}
+                    onClose={onClose}
+                >
+                    <AlertDialogOverlay>
+                        <AlertDialogContent>
+                            <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                                Erro
+                            </AlertDialogHeader>
+
+                            <AlertDialogBody>
+                                {errorFixed}
+                            </AlertDialogBody>
+
+                            <AlertDialogFooter>
+                                <Button colorScheme='red' onClick={onClose} ml={3}>
+                                    Fechar
+                                </Button>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialogOverlay>
+                </AlertDialog>
+            
                 </div>
         </Container>
     )
