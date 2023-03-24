@@ -184,14 +184,14 @@ export function Home() {
         <div className="Buttons">
           <button
             id="imageBtn"
-            className="ImgButton"
+            className="ImgButton1"
             type="button"
             onClick={toggle}
             disabled={toggleBtn}
           ></button>
           <button
             id="table"
-            className="ImgButton"
+            className="ImgButton2"
             type="button"
             onClick={toggle}
             disabled={!toggleBtn}

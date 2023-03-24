@@ -85,7 +85,7 @@ export function Register() {
                             
                         />
                        
-                        <ButtonSend onClick={() => handleRegister}>Acessar a plataforma</ButtonSend>
+                        <ButtonSend onClick={() => handleRegister(event)}>Acessar a plataforma</ButtonSend>
                         <Link to="/" className="Text">Já possui uma conta? Faça login</Link>
                     </fieldset>
                 </form>

@@ -1,7 +1,10 @@
 import styled from "styled-components";
 
 import carosseulToggle from "../../assets/Carrosselcon.svg";
-import tableIcon from "../../assets/TableIcon.svg";
+import carosseulToggleGray from "../../assets/CarrosselToggleGray.svg";
+import tableIconGray from "../../assets/TableIcon.svg";
+import tableIcon from "../../assets/tabbleToggleGray.svg";
+
 
 export const Container = styled.div`
   display: flex;
@@ -41,7 +44,7 @@ export const Container = styled.div`
   .buttons {
     flex-direction: row;
   }
-  .ImgButton {
+  .ImgButton1 {
     height: 50px;
     width: 75px;
     background-color: #c7c7c7;
@@ -49,17 +52,39 @@ export const Container = styled.div`
     border-radius: 0;
     border: 1px #7d7d7d;
     border-style: solid;
-    background-image: url(${tableIcon});
+    background-image: url(${carosseulToggleGray});
     background-repeat: no-repeat;
     background-position: center;
+    transition: none;
   }
-  .ImgButton:disabled {
+  .ImgButton1:disabled {
+    transition: none;
+    transform: none;
     background-color: #fff;
-  }
-  .ImgButton:first-of-type {
     background-image: url(${carosseulToggle});
   }
-  .ImgButton:hover:enabled {
+
+  .ImgButton1:hover:enabled {
+    background-color: #c7c7c7;
+  }
+  .ImgButton2 {
+    height: 50px;
+    width: 75px;
+    background-color: #c7c7c7;
+    padding: 24px;
+    border-radius: 0;
+    border: 1px #7d7d7d;
+    border-style: solid;
+    background-image: url(${tableIconGray});
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: none;
+  }
+  .ImgButton2:disabled {
+    background-color: #fff;
+    background-image: url(${tableIcon});
+  }
+  .ImgButton2:hover:enabled {
     background-color: #c7c7c7;
   }
   .AddImages {

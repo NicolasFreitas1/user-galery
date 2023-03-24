@@ -12,9 +12,9 @@ import { ChakraProvider } from "@chakra-ui/react";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <ChakraProvider>
+    <GlobalStyle />
     <React.StrictMode>
-      <GlobalStyle />
-        <RouterComponent />
+     <RouterComponent />
     </React.StrictMode>
   </ChakraProvider>
 );
