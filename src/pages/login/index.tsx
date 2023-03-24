@@ -15,6 +15,9 @@ import {
     useDisclosure,
   } from '@chakra-ui/react'
 
+import ButtonSend from  '../../components/ButtonSend';
+import Input from '../../components/Input';
+
 export function Login() {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const cancelRef = React.useRef()
@@ -61,20 +64,18 @@ export function Login() {
                 <form method="post">
                     <fieldset>
                         <legend>Entrar</legend>
-                        <input
+                        <Input
                             type="text"
                             placeholder='Digite seu usuário'
-                            onChange={e => setLogin(e.target.value)}
-                            required
+                            onChange={setLogin}
                         />
-                        <input
+                        <Input
                             type="password"
                             placeholder='Digite sua senha'
-                            onChange={e => setPassword(e.target.value)}
-                            required
+                            onChange={setPassword}
                         />
                         
-                        <button type="submit" onClick={handleLogin}>Acessar a plataforma</button>
+                       <ButtonSend onClick={() => handleLogin(event)}>Acessar a plataforma</ButtonSend>
                         <Link to="/register" className="Text">Não possui uma conta? Registrar-se</Link>
                     </fieldset>
                 </form>

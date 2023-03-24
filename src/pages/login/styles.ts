@@ -9,28 +9,6 @@ export const Container = styled.div`
     display: flex;
     align-items: center;
     flex-direction: column;
-
-    button {
-        height: 63;
-        padding: 24px;
-        font-weight: 700;
-
-        background-color: #008FFB;
-        color: #fff;
-
-        border-radius: 5px;
-        margin: 12px 0 50px;
-        border: none;
-
-        cursor: pointer;
-        transition: 0.5s;
-
-        font-size: 16px;
-
-    };
-    button:hover {
-        background-color: #007DDC;
-    };
    
     fieldset {
         padding: 24px;
@@ -43,18 +21,6 @@ export const Container = styled.div`
     legend {
         font-size: 32px;
         font-weight: 700;
-    };
-    input{
-        height: 48px;
-        width: 392px;
-        padding: 24px;
-        font-weight: 700;
-
-        background: #E6E6E6;
-        border-radius: 5px;
-        border: none;
-        margin-bottom: 5%;
-        font-size: 16px;
     };
 
         

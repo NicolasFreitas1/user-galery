@@ -9,6 +9,9 @@ import teste111 from "../login/assets/teste111.jpg"
 import { AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter } from '@chakra-ui/modal';
 import { Button, useDisclosure } from '@chakra-ui/react';
 
+import ButtonSend from '../../components/ButtonSend';
+import Input from '../../components/Input';
+
 export function Register() {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const cancelRef = React.useRef()
@@ -23,7 +26,7 @@ export function Register() {
 
    
 
-    async function handleLogin(event: any) {
+    async function handleRegister(event: any) {
         event.preventDefault()
         
         try {
@@ -59,30 +62,30 @@ export function Register() {
                 <form method="post">
                     <fieldset>
                         <legend>Registrar-se</legend>
-                        <input
+                        <Input
                             type="text"
                             placeholder='Digite seu nome'
-                            onChange={e => setName(e.target.value)} 
-                            required
+                            onChange={setName} 
+
                             
                         />
-                        <input
-                            required
+                        <Input
+                    
                             type="text"
                             placeholder='Digite seu usuário'
-                            onChange={e => setLogin(e.target.value)} 
+                            onChange={setLogin} 
                             
                             
                         />
-                        <input
-                            required
+                        <Input 
+      
                             type="password"
                             placeholder='Digite sua senha'
-                            onChange={e => setPassword(e.target.value)}
+                            onChange={setPassword}
                             
                         />
                        
-                        <button type="submit" onClick={handleLogin}>Acessar a plataforma</button>
+                        <ButtonSend onClick={() => handleRegister}>Acessar a plataforma</ButtonSend>
                         <Link to="/" className="Text">Já possui uma conta? Faça login</Link>
                     </fieldset>
                 </form>
