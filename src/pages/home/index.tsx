@@ -29,6 +29,12 @@ import { ModalComponent } from "../../components/Modal";
 
 Modal.setAppElement("#root");
 
+interface Image {
+  id: number;
+  name: string;
+  url: string;
+}
+
 export function Home() {
   const navigate = useNavigate();
 
@@ -39,11 +45,10 @@ export function Home() {
   const errorFixed = showError.replace(/"/g, "");
   const [toggleBtn, setToggleBtn] = useState(true);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [images, setImages] = useState([]);
-/*   const [image, setImage] = useState(null);
+  /*   const [image, setImage] = useState(null);
   const [fileName, setFileName] = useState("No file selected"); */
-  const [imageURL, setImageURL] = useState("");
-  const [imageName, setImageName] = useState([])
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [images, setImages] = useState<Image[]>([]);
 
   const toggle = () => {
     setToggleBtn((prevState) => !prevState);
@@ -59,7 +64,8 @@ export function Home() {
   useEffect(() => {
     async function getImage() {
       try {
-        const { data } = await api.get("/get_images/");
+        const { data } = await api.get<Image[]>("/get_images");
+        localStorage.getItem("token");
         console.log(data);
         setImages(data);
       } catch (error: any) {
@@ -74,42 +80,45 @@ export function Home() {
   // Envia a imagem para um serviço de armazenamento em nuvem
 
 
-  const handleImageUpload = async (file) => {
-    // Envia a imagem para um serviço de armazenamento em nuvem
-    const formData = new FormData();
-    formData.append("image", file[0]);
-
-    const response = await fetch("http://localhost:3000/upload_image", {
-      method: "POST",
-      body: formData,
-    });
-
-    // Obtém a URL da imagem a partir da resposta
-   
-    const data = await response.json();
-    console.log(data)
-    const imageUrl = data.imageUrl;
-    const imageName = data.image.name;
-
-    // Define a URL da imagem no estado do componente
-    setImageURL(imageUrl);
-    setImageName(imageName);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedFile(e.target.files![0]);
+    
   };
- /*  async function postImages() {
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!selectedFile) return;
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+
     try {
-      const { data } = await api.post("/upload_image/", {
-        name: fileName,
-      });
-      console.log(data);
-      setImages(data);
-      closeModal();
-    } catch (error: any) {
-      onOpen();
-      setShowError(JSON.stringify(error.response.data.message));
-      console.log(JSON.stringify(error.response.data.message));
+      const response = await api.post('/upload_image',formData );
+      console.log(formData)
+      console.log(response.data);
+
+      const imageUrl = response.data.url;
+      console.log(imageUrl)
+      localStorage.setItem("image_url", imageUrl);
+      const urlImagem = localStorage.getItem('image_url');
+
+      if (urlImagem) {
+        const imgElement = document.getElementById('aaaaImagem') as HTMLImageElement;
+        if (imgElement){
+          imgElement.src = urlImagem;
+        }
+        
+      } else {
+        console.log('A imagem não foi encontrada no localStorage.');
+      }
+      closeModal;
+
+
+    } catch (error) {
+      console.log(error);
     }
-  }
- */
+  };
+
   function handleLogout() {
     localStorage.clear();
     navigate("/");
@@ -117,14 +126,12 @@ export function Home() {
   function goBack() {
     navigate("/");
   }
-// Data carrossel 
+  // Data carrossel
   const dataImg = [
-    
     {
-      image: `${imageURL}`,
-      caption: `${imageName}`,
+      image: `${images}`,
+      caption: `${images}`,
     },
-  
   ];
 
   const captionStyle = {
@@ -175,6 +182,8 @@ export function Home() {
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     tableInstance;
 
+
+
   return (
     <Container>
       <header>
@@ -211,7 +220,10 @@ export function Home() {
         className="Carousel"
         style={{ display: toggleBtn ? "block" : "none" }}
       >
-        <Carousel
+        {images.map((image) => (
+        <img id="aaaaImagem" key={image.id} alt={image.name} />
+      ))}
+{/*         <Carousel
           data={dataImg}
           time={2000}
           width="850px"
@@ -235,7 +247,7 @@ export function Home() {
             maxHeight: "500px",
             margin: "40px auto",
           }}
-        />
+        /> */}
       </div>
 
       <div style={{ display: !toggleBtn ? "block" : "none" }}>
@@ -288,24 +300,17 @@ export function Home() {
 
       <ModalComponent isOpen={modalIsOpen} close={closeModal}>
         <Teste>
-          {imageURL ? (
-            <img src={imageURL} alt="Uploaded image" />
-          ) : (
-            <Dropzone onDrop= {handleImageUpload}>
-              {({ getRootProps, getInputProps }) => (
-                <div className="fieldImage"{...getRootProps()}>
-                  <input {...getInputProps()} />
-                  <img src={imageInput} width={50} alt="Upload image" />
-                  
-                </div>
-                
-              )}  
-            </Dropzone>
-          )}
+        <form onSubmit={handleSubmit}>
+        <input type="file"  name="file" accept="image/*" onChange={handleFileChange} />
           <div className="ButtonsModal">
-          <button className="ModalButton" onClick={() => {handleImageUpload}}>Concluir </button>
-          <button className="ModalButton" onClick={closeModal}>Cancelar </button>
+            <button className="ModalButton">
+              Concluir
+            </button>
+            <button type="reset" className="ModalButton" onClick={closeModal}>
+              Cancelar
+            </button>
           </div>
+          </form>
         </Teste>
       </ModalComponent>
 

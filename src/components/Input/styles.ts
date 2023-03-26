@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const InputText = styled.input`
     height: 48px;
-    width: 392px;
+    width: 20rem;
     padding: 24px;
     font-weight: 700;
 

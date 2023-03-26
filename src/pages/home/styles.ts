@@ -5,7 +5,6 @@ import carosseulToggleGray from "../../assets/CarrosselToggleGray.svg";
 import tableIconGray from "../../assets/TableIcon.svg";
 import tableIcon from "../../assets/tabbleToggleGray.svg";
 
-
 export const Container = styled.div`
   display: flex;
   align-items: center;
@@ -111,22 +110,21 @@ export const Container = styled.div`
 `;
 
 export const Teste = styled.div`
-    display: flex;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
 
-
-.ModalButton {
+  .ModalButton {
     height: 57px;
     width: 179px;
     padding: 14px 34px;
     font-weight: 700;
 
-    background-color: #008FFB;
-    color: #FFF;
+    background-color: #008ffb;
+    color: #fff;
 
     border-radius: 3px;
     margin: 12px 0 10px;
@@ -136,27 +134,26 @@ export const Teste = styled.div`
     transition: 0.5s;
     align-items: center;
     font-size: 16px;
-}
-.ModalButton:hover{
-    background-color: #0078D7;
-}
-.ModalButton:last-of-type{
-    background-color: #7D7D7D;
-}
-.ModalButton:last-of-type:hover{
-    background-color: #F63F60;
-    color: #FFF;
-}
-.ButtonsModal{
+  }
+  .ModalButton:hover {
+    background-color: #0078d7;
+  }
+  .ModalButton:last-of-type {
+    background-color: #7d7d7d;
+  }
+  .ModalButton:last-of-type:hover {
+    background-color: #f63f60;
+    color: #fff;
+  }
+  .ButtonsModal {
     margin-top: 1%;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
     gap: 30px;
-    
-}
-.fieldImage {
+  }
+  .fieldImage {
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -166,9 +163,8 @@ export const Teste = styled.div`
     width: 450px;
     cursor: pointer;
     border-radius: 5px;
-
-}
-.UploadedRow{
+  }
+  .UploadedRow {
     width: auto;
     margin: 10px 0;
     display: flex;
@@ -176,9 +172,9 @@ export const Teste = styled.div`
     padding: 15px 20px;
     border-radius: 5px;
     background-color: #e9f0ff;
-}
-.UploadedContent{
+  }
+  .UploadedContent {
     display: flex;
     align-items: center;
-}
+  }
 `;
