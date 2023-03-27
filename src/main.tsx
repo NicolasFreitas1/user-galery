@@ -1,3 +1,4 @@
+
 import GlobalStyle from "./styles/global";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
@@ -13,7 +14,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <ChakraProvider>
     <GlobalStyle />
     <React.StrictMode>
-      <RouterComponent />
+     <RouterComponent />
     </React.StrictMode>
   </ChakraProvider>
 );

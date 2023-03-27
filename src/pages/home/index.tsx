@@ -1,5 +1,7 @@
 import { useState, useEffect, ChangeEvent } from "react";
 import * as React from "react";
+import * as fs from "fs";
+import * as path from "path";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { Container, Teste } from "./styles";
@@ -18,7 +20,6 @@ import {
 } from "@chakra-ui/react";
 
 import { useTable } from "react-table";
-
 
 import imagem from "../../assets/teste111.jpg";
 import imageInput from "../../assets/imageImput.svg";
@@ -43,15 +44,10 @@ export function Home() {
   const errorFixed = showError.replace(/"/g, "");
   const [toggleBtn, setToggleBtn] = useState(true);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  /*   const [image, setImage] = useState(null);
-  const [fileName, setFileName] = useState("No file selected"); */
+  /*   const [image, setImage] = useState(null); */
+  const [fileName, setFileName] = useState("No file selected");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [images, setImages] = useState<Image[]>([]);
-  const [imageData, setImageData] = useState<string>('');
-
-  const imageUrl = localStorage.getItem('image');
-  const blob = imageUrl ? new Blob([imageUrl], { type: 'image/*' }) : null;
-  const image = blob ? URL.createObjectURL(blob) : null;
 
   const toggle = () => {
     setToggleBtn((prevState) => !prevState);
@@ -68,10 +64,11 @@ export function Home() {
     async function getImage() {
       try {
         const { data } = await api.get<Image[]>("/get_images");
-        localStorage.getItem("token");
-        console.log(data);
-        setImages(data);
 
+        const token = localStorage.getItem("token");
+        api.defaults.headers.authorization = `Bearer ${token}`;
+       
+        setImages(data);
       } catch (error: any) {
         onOpen();
         setShowError(JSON.stringify(error.response.data.message));
@@ -81,56 +78,66 @@ export function Home() {
     getImage();
   }, []);
 
-  const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    const reader = new FileReader();
+  const handleFileInputChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setSelectedFile(event.target.files![0]);
-    console.log(selectedFile)
-
-    reader.onloadend = () => {
-      setImageData(reader.result as string);
-      localStorage.setItem('image', reader.result as string);
-    };
-
-    if (file) {
-      reader.readAsDataURL(file);
-    }
+    console.log(selectedFile);
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-
     if (!selectedFile) return;
 
     const formData = new FormData();
-    formData.append('file', selectedFile);
+    formData.append("image", selectedFile);
 
-
+    setFileName(selectedFile.name);
 
     try {
-      console.log(imageData)
-      const { data } = await api.post('/upload_image', formData);
-      console.log('Resposta do servidor:', data);
+      const { data } = await api.post("/upload_image", formData);
+      console.log("Resposta do servidor:", data);
+      setImages([...images, data]);
+    
+    } catch (error) {
+      console.error("Erro ao enviar imagem:", error);
     }
-     catch (error) {
-      console.error('Erro ao enviar imagem:', error);
-    }
+  };
+
+  function handleCancel() {
+    localStorage.removeItem("image");
+    setModalIsOpen(false);
   }
 
-
   function handleLogout() {
-    localStorage.clear();
+    localStorage.removeItem("token");
     navigate("/");
   }
   function goBack() {
     navigate("/");
   }
   // Data carrossel
+  /* 
+  const fun = () => {
+    const te = testeImagens.map((testeImag)=> {
+      image: testeImag,
+      caption: = shdks
+    })
+  }
+ */
   const dataImg = [
     {
-      image: `${imageUrl}`,
-      caption: `${image}`,
+      image: `${images}`,
+      caption: `${fileName}`,
+    },
+    {
+      image: `${images}`,
+      caption: `${fileName}`,
+    },
+    {
+      image: `${images}`,
+      caption: `${fileName}`,
     },
   ];
 
@@ -151,7 +158,7 @@ export function Home() {
     ],
     []
   );
-  const columns = React.useMemo(
+  /*   const columns = React.useMemo(
     () => [
       {
         Header: "Id",
@@ -162,16 +169,21 @@ export function Home() {
         accessor: "name",
       },
       {
-        Header: "Data de criação",
-        accessor: "createdAt",
+        Header: "Extensão",
+        accessor: "extensao",
       },
+      ,
       {
         Header: "Tamanho",
         accessor: "vlSize",
       },
       {
+        Header: "Data de criação",
+        accessor: "createdAt",
+      },
+      {
         Header: "Ações",
-        accessor: `${FormData.name}`,
+        accessor: "col4",
       },
     ],
     []
@@ -180,9 +192,7 @@ export function Home() {
   const tableInstance = useTable({ columns, data });
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    tableInstance;
-
-
+    tableInstance; */
 
   return (
     <Container>
@@ -215,13 +225,13 @@ export function Home() {
           Upload de imagem
         </button>
       </header>
+      <img src="http://localhost:3000/get_images" alt="image" />
 
       <div
         className="Carousel"
         style={{ display: toggleBtn ? "block" : "none" }}
       >
-
-        <Carousel
+        {/*      <Carousel
           data={dataImg}
           time={2000}
           width="850px"
@@ -245,12 +255,11 @@ export function Home() {
             maxHeight: "500px",
             margin: "40px auto",
           }}
-        />
-
+        /> */}
       </div>
 
       <div style={{ display: !toggleBtn ? "block" : "none" }}>
-        <table {...getTableProps()} style={{ border: "solid 1px #7D7D7D" }}>
+        {/*         <table {...getTableProps()} style={{ border: "solid 1px #7D7D7D" }}>
           <thead>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
@@ -294,19 +303,31 @@ export function Home() {
               );
             })}
           </tbody>
-        </table>
+        </table> */}
       </div>
 
       <ModalComponent isOpen={modalIsOpen} close={closeModal}>
         <Teste>
-          <form onSubmit={handleSubmit}>
-            <input type="file" name="file" accept="image/*" onChange={handleFileInputChange} />
-            {imageData && <img src={imageData} alt="Imagem" height={150} width={150} />}
+          <form name="image" onSubmit={handleSubmit}>
+            <fieldset className="fieldImage">
+              <input
+                type="file"
+                name="image"
+                accept="image/*"
+                onChange={handleFileInputChange}
+              />
+
+        
+            </fieldset>
             <div className="ButtonsModal">
-              <button type="submit" className="ModalButton" >
+              <button type="submit" className="ModalButton">
                 Concluir
               </button>
-              <button type="reset" className="ModalButton" onClick={closeModal}>
+              <button
+                type="reset"
+                className="ModalButton"
+                onClick={handleCancel}
+              >
                 Cancelar
               </button>
             </div>
