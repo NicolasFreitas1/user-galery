@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
@@ -17,10 +17,8 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 
-import { DeleteIcon } from "@chakra-ui/icons";
 import { useTable } from "react-table";
-import jwt from "jsonwebtoken";
-import Dropzone from "react-dropzone";
+
 
 import imagem from "../../assets/teste111.jpg";
 import imageInput from "../../assets/imageImput.svg";
@@ -49,6 +47,11 @@ export function Home() {
   const [fileName, setFileName] = useState("No file selected"); */
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [images, setImages] = useState<Image[]>([]);
+  const [imageData, setImageData] = useState<string>('');
+
+  const imageUrl = localStorage.getItem('image');
+  const blob = imageUrl ? new Blob([imageUrl], { type: 'image/*' }) : null;
+  const image = blob ? URL.createObjectURL(blob) : null;
 
   const toggle = () => {
     setToggleBtn((prevState) => !prevState);
@@ -68,6 +71,7 @@ export function Home() {
         localStorage.getItem("token");
         console.log(data);
         setImages(data);
+
       } catch (error: any) {
         onOpen();
         setShowError(JSON.stringify(error.response.data.message));
@@ -77,47 +81,43 @@ export function Home() {
     getImage();
   }, []);
 
-  // Envia a imagem para um serviço de armazenamento em nuvem
+  const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    const reader = new FileReader();
+    setSelectedFile(event.target.files![0]);
+    console.log(selectedFile)
 
+    reader.onloadend = () => {
+      setImageData(reader.result as string);
+      localStorage.setItem('image', reader.result as string);
+    };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedFile(e.target.files![0]);
-    
+    if (file) {
+      reader.readAsDataURL(file);
+    }
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+
     if (!selectedFile) return;
 
     const formData = new FormData();
     formData.append('file', selectedFile);
 
+
+
     try {
-      const response = await api.post('/upload_image',formData );
-      console.log(formData)
-      console.log(response.data);
-
-      const imageUrl = response.data.url;
-      console.log(imageUrl)
-      localStorage.setItem("image_url", imageUrl);
-      const urlImagem = localStorage.getItem('image_url');
-
-      if (urlImagem) {
-        const imgElement = document.getElementById('aaaaImagem') as HTMLImageElement;
-        if (imgElement){
-          imgElement.src = urlImagem;
-        }
-        
-      } else {
-        console.log('A imagem não foi encontrada no localStorage.');
-      }
-      closeModal;
-
-
-    } catch (error) {
-      console.log(error);
+      console.log(imageData)
+      const { data } = await api.post('/upload_image', formData);
+      console.log('Resposta do servidor:', data);
     }
-  };
+     catch (error) {
+      console.error('Erro ao enviar imagem:', error);
+    }
+  }
+
 
   function handleLogout() {
     localStorage.clear();
@@ -129,8 +129,8 @@ export function Home() {
   // Data carrossel
   const dataImg = [
     {
-      image: `${images}`,
-      caption: `${images}`,
+      image: `${imageUrl}`,
+      caption: `${image}`,
     },
   ];
 
@@ -220,10 +220,8 @@ export function Home() {
         className="Carousel"
         style={{ display: toggleBtn ? "block" : "none" }}
       >
-        {images.map((image) => (
-        <img id="aaaaImagem" key={image.id} alt={image.name} />
-      ))}
-{/*         <Carousel
+
+        <Carousel
           data={dataImg}
           time={2000}
           width="850px"
@@ -247,7 +245,8 @@ export function Home() {
             maxHeight: "500px",
             margin: "40px auto",
           }}
-        /> */}
+        />
+
       </div>
 
       <div style={{ display: !toggleBtn ? "block" : "none" }}>
@@ -300,16 +299,17 @@ export function Home() {
 
       <ModalComponent isOpen={modalIsOpen} close={closeModal}>
         <Teste>
-        <form onSubmit={handleSubmit}>
-        <input type="file"  name="file" accept="image/*" onChange={handleFileChange} />
-          <div className="ButtonsModal">
-            <button className="ModalButton">
-              Concluir
-            </button>
-            <button type="reset" className="ModalButton" onClick={closeModal}>
-              Cancelar
-            </button>
-          </div>
+          <form onSubmit={handleSubmit}>
+            <input type="file" name="file" accept="image/*" onChange={handleFileInputChange} />
+            {imageData && <img src={imageData} alt="Imagem" height={150} width={150} />}
+            <div className="ButtonsModal">
+              <button type="submit" className="ModalButton" >
+                Concluir
+              </button>
+              <button type="reset" className="ModalButton" onClick={closeModal}>
+                Cancelar
+              </button>
+            </div>
           </form>
         </Teste>
       </ModalComponent>
