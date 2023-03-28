@@ -19,6 +19,7 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 
+import base64ToImage from 'base64-to-image';
 import { useTable } from "react-table";
 
 import imagem from "../../assets/teste111.jpg";
@@ -33,6 +34,7 @@ interface Image {
   filename: string;
   base64: string;
   data: string;
+  
 }
 
 export function Home() {
@@ -48,6 +50,7 @@ export function Home() {
   /*   const [image, setImage] = useState(null); */
   const [fileName, setFileName] = useState("No file selected");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [result, setResult] = useState()
   const [images, setImages] = useState<Image[]>([]);
   const [imageData, setImageData] = useState("");
 
@@ -65,23 +68,42 @@ export function Home() {
 useEffect(() => {
   async function getImage() {
     try {
-      const { data } = await api.get<Image[]>("/get_images");
+      const { data } = await api.get("/get_images");
       console.log(data);
       const token = localStorage.getItem("token");
       api.defaults.headers.authorization = `Bearer ${token}`;
-      const imageDataArray = data.map(image => image.data);
-      const imageDataJson = JSON.stringify(imageDataArray).replace('["', "");
-      setImageData(imageDataJson);
-      
+
+  
+/*       const imageDataArray = data.map(image => image.data).toString();
+      const imageDataJson = JSON.stringify(imageDataArray).replaceAll(/["]/g, '');
+      setImageData(JSON.stringify(imageDataJson));
       console.log(imageDataJson);
-    } catch (error: any) {
-      onOpen();
-      setShowError(JSON.stringify(error.response.data.message));
-      console.log(JSON.stringify(error.response.data.message));
+      console.log(imageData); */
+      setImages(data)
+      
+
+    } 
+    catch (error: any) {
+/*       onOpen();
+/*       setShowError(JSON.stringify(error.response.data.message));*/
+      console.log(JSON.stringify(error.response.data.message));  
     }
   }
   getImage();
 }, []);
+
+const imageBase64 = `data:image/*;base64, ${imageData.replaceAll('"','')}`; // a string com a imagem em base64
+
+// cria um blob a partir da imagem em base64
+const blob = new Blob([imageBase64], { type: "image/*" });
+
+
+// cria uma URL para o blob
+const imageUrl = URL.createObjectURL(blob);
+
+
+
+
 
   const handleFileInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -131,20 +153,14 @@ useEffect(() => {
     })
   }
  */
-  const dataImg = [
+
+/*   const dataImg = [
     {
-      image: `${images}`,
-      caption: `${fileName}`,
+      image: `${imageBase64}`,
+      caption: `${imageUrl}`,
     },
-    {
-      image: `${images}`,
-      caption: `${fileName}`,
-    },
-    {
-      image: `${images}`,
-      caption: `${fileName}`,
-    },
-  ];
+  
+  ]; */
 
   const captionStyle = {
     fontSize: "2em",
@@ -158,12 +174,13 @@ useEffect(() => {
     () => images,
     [
       {
-        col4: "Ações",
+        col4: "Bytes"
       },
+      
     ],
     []
   );
-  /*   const columns = React.useMemo(
+    const columns = React.useMemo(
     () => [
       {
         Header: "Id",
@@ -175,7 +192,7 @@ useEffect(() => {
       },
       {
         Header: "Extensão",
-        accessor: "extensao",
+        accessor: `extensao`,
       },
       ,
       {
@@ -187,7 +204,7 @@ useEffect(() => {
         accessor: "createdAt",
       },
       {
-        Header: "Ações",
+        Header: "Ações", 
         accessor: "col4",
       },
     ],
@@ -197,7 +214,7 @@ useEffect(() => {
   const tableInstance = useTable({ columns, data });
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    tableInstance; */
+    tableInstance;
 
   return (
     <Container>
@@ -230,15 +247,16 @@ useEffect(() => {
           Upload de imagem
         </button>
       </header>
-      {imageData && (
-        <img src={`data:image/*,${imageData}`} alt="Imagem" />
-      )}
+
+        
+      
 
       <div
         className="Carousel"
         style={{ display: toggleBtn ? "block" : "none" }}
       >
-        {/*      <Carousel
+{/*         <img src={imageBase64} alt="Imagem" width={300} height={300} /> */}
+             {/* <Carousel
           data={dataImg}
           time={2000}
           width="850px"
@@ -266,7 +284,7 @@ useEffect(() => {
       </div>
 
       <div style={{ display: !toggleBtn ? "block" : "none" }}>
-        {/*         <table {...getTableProps()} style={{ border: "solid 1px #7D7D7D" }}>
+                <table {...getTableProps()} style={{ border: "solid 1px #7D7D7D" }}>
           <thead>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
@@ -291,7 +309,7 @@ useEffect(() => {
             {rows.map((row) => {
               prepareRow(row);
               return (
-                <tr {...row.getRowProps()}>
+                <tr {...row.getRowProps()}> 
                   {row.cells.map((cell) => {
                     return (
                       <td
@@ -303,14 +321,20 @@ useEffect(() => {
                         }}
                       >
                         {cell.render("Cell")}
-                      </td>
+                        
+                       </td>
+                      
                     );
+                    
                   })}
+                       
                 </tr>
               );
             })}
+            
           </tbody>
-        </table> */}
+          
+        </table>
       </div>
 
       <ModalComponent isOpen={modalIsOpen} close={closeModal}>

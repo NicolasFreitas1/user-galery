@@ -4,7 +4,7 @@ import { Button } from './styles'
 
 interface Props {
     children?: React.ReactNode;
-    onClick: () => void;
+    onClick?: () => void;
 }
 
 const ButtonSend: React.FC<Props> = ({ 

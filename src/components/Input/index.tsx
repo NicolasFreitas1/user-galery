@@ -6,6 +6,7 @@ interface Props {
     type?: string;
     children?: React.ReactNode;
     onChange: (str: string) => void;
+    required?: boolean;
 }
 
 const Input: React.FC<Props> = ({ 
@@ -20,6 +21,7 @@ const Input: React.FC<Props> = ({
         placeholder={placeholder}
         type={type}
         onChange={e => onChange(e.target.value)}
+        required
     >
         {children}
     </InputText>

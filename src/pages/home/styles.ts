@@ -109,6 +109,13 @@ export const Container = styled.div`
   .AddImages:hover {
     background-color: #007ddc;
   }
+  .Botaoooo{
+    background-color: #f63f60;
+    width: 25px;
+    height: 25px;
+    border-radius: 3px;
+
+  }
 `;
 
 export const Teste = styled.div`
