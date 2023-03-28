@@ -30,8 +30,9 @@ Modal.setAppElement("#root");
 
 interface Image {
   id: number;
-  name: string;
-  url: string;
+  filename: string;
+  base64: string;
+  data: string;
 }
 
 export function Home() {
@@ -48,6 +49,7 @@ export function Home() {
   const [fileName, setFileName] = useState("No file selected");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [images, setImages] = useState<Image[]>([]);
+  const [imageData, setImageData] = useState("");
 
   const toggle = () => {
     setToggleBtn((prevState) => !prevState);
@@ -60,23 +62,26 @@ export function Home() {
     setModalIsOpen(false);
   }
 
-  useEffect(() => {
-    async function getImage() {
-      try {
-        const { data } = await api.get<Image[]>("/get_images");
-
-        const token = localStorage.getItem("token");
-        api.defaults.headers.authorization = `Bearer ${token}`;
-       
-        setImages(data);
-      } catch (error: any) {
-        onOpen();
-        setShowError(JSON.stringify(error.response.data.message));
-        console.log(JSON.stringify(error.response.data.message));
-      }
+useEffect(() => {
+  async function getImage() {
+    try {
+      const { data } = await api.get<Image[]>("/get_images");
+      console.log(data);
+      const token = localStorage.getItem("token");
+      api.defaults.headers.authorization = `Bearer ${token}`;
+      const imageDataArray = data.map(image => image.data);
+      const imageDataJson = JSON.stringify(imageDataArray).replace('["', "");
+      setImageData(imageDataJson);
+      
+      console.log(imageDataJson);
+    } catch (error: any) {
+      onOpen();
+      setShowError(JSON.stringify(error.response.data.message));
+      console.log(JSON.stringify(error.response.data.message));
     }
-    getImage();
-  }, []);
+  }
+  getImage();
+}, []);
 
   const handleFileInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -225,7 +230,9 @@ export function Home() {
           Upload de imagem
         </button>
       </header>
-      <img src="http://localhost:3000/get_images" alt="image" />
+      {imageData && (
+        <img src={`data:image/*,${imageData}`} alt="Imagem" />
+      )}
 
       <div
         className="Carousel"
