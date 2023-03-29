@@ -5,7 +5,8 @@ import carosseulToggleGray from "../../assets/CarrosselToggleGray.svg";
 import tableIconGray from "../../assets/TableIcon.svg";
 import tableIcon from "../../assets/tabbleToggleGray.svg";
 import imageImput from "../../assets/imageImput.svg";
-
+import viewImage from "../../assets/olho.svg";
+import deleteImage from "../../assets/LixoImg.svg";
 
 export const Container = styled.div`
   display: flex;
@@ -116,6 +117,35 @@ export const Container = styled.div`
     border-radius: 3px;
 
   }
+
+  .ViewImage {
+    background-color: #007ddc;
+    background-image: url(${viewImage});
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 25px;
+    height: 25px;
+    border-radius: 3px;
+    margin-right: 5px;
+  }
+  .ViewImage:hover{
+    background-color: #007ddc;
+  }
+  .DeleteImage {
+    background-color: #f63f60;
+    background-image: url(${deleteImage});
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 25px;
+    height: 25px;
+    border-radius: 3px;
+  }
+
+  h1{
+    font-weight: 700;
+    font-family: "Montserrat", sans-serif;
+    font-size: x-large;
+  }
 `;
 
 export const Teste = styled.div`
@@ -174,8 +204,8 @@ export const Teste = styled.div`
     flex-direction: column;
     justify-content: center;
     border: 2px dashed #1475cf;
-    height: 100%;
-    width: 450px;
+    height: 200px;
+    width: 100%;
     cursor: pointer;
     border-radius: 5px;
 

@@ -1,11 +1,9 @@
-import { useState, useEffect, ChangeEvent } from "react";
+import { useState, useEffect } from "react";
 import * as React from "react";
-import * as fs from "fs";
-import * as path from "path";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { Container, Teste } from "./styles";
-
+// @ts-ignore
 import { Carousel } from "react-carousel-minimal";
 import Modal from "react-modal";
 import {
@@ -15,48 +13,40 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogOverlay,
-  Button,
   useDisclosure,
+  Button,
 } from "@chakra-ui/react";
 
-import base64ToImage from 'base64-to-image';
 import { useTable } from "react-table";
 
-import imagem from "../../assets/teste111.jpg";
-import imageInput from "../../assets/imageImput.svg";
-import LixoImg from "../../assets/LixoImg.svg";
 import { ModalComponent } from "../../components/Modal";
 
 Modal.setAppElement("#root");
 
 interface Image {
   id: number;
-  filename: string;
-  base64: string;
+  name: string;
+  extensao: string;
+  createdAt: string;
+  size: number;
+  nmStored: string;
   data: string;
-  
 }
 
 export function Home() {
   const navigate = useNavigate();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
-
   const cancelRef = React.useRef();
   const [showError, setShowError] = useState("");
-  const errorFixed = showError.replace(/"/g, "");
+  const errorFixed = showError;
   const [toggleBtn, setToggleBtn] = useState(true);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  /*   const [image, setImage] = useState(null); */
-  const [fileName, setFileName] = useState("No file selected");
+  const [modalIsOpen2, setModalIsOpen2] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [result, setResult] = useState()
   const [images, setImages] = useState<Image[]>([]);
-  const [imageData, setImageData] = useState<string>('');
-  const [imageUrl, setImageUrl] = useState<string>('');
+  const [imageById, setImageById] = useState<Image[]>([]);
 
-  const [imageSrc, setImageSrc] = useState(null);
-  
   const toggle = () => {
     setToggleBtn((prevState) => !prevState);
   };
@@ -68,53 +58,63 @@ export function Home() {
     setModalIsOpen(false);
   }
 
-useEffect(() => {
-  async function getImage() {
-    try {
-      const response = await api.get('get_images');
-      const token = localStorage.getItem("token");
-      api.defaults.headers.authorization = `Bearer ${token}`;
-      setImages(response.data);
-    }
+  function openModal2() {
+    setModalIsOpen2(true);
+  }
+  function closeModal2() {
+    setModalIsOpen2(false);
+  }
+
+  useEffect(() => {
+     verifyToken();
+     getImage();
+    }, []);
+
+  async function verifyToken() {
+    const token = localStorage.getItem("token");
     
-  
-    catch (error: any) {
-    /*       onOpen();
-    /*       setShowError(JSON.stringify(error.response.data.message));*/
-          console.log(JSON.stringify(error.response.data.message));  
+
+    if (token) {
+      navigate("/home");
+      api.defaults.headers.authorization = `Bearer ${token}`;
+    }
+    else{
+      navigate("/");
     }
   }
-  getImage();
-}, []);
 
-    /*   setImageData(JSON.stringify(data));
-      const file = data.images.base64.split(',')[1];
-      console.log(file);
-      const url = URL.createObjectURL(await fetch(`data:image/png;base64,${file}`).then(res => res.blob()));
-      setImageUrl(url); */
-  
-/*       const imageDataArray = data.map(image => image.data).toString();
-      const imageDataJson = JSON.stringify(imageDataArray).replaceAll(/["]/g, '');
-      setImageData(JSON.stringify(imageDataJson));
-      console.log(imageDataJson);
-      console.log(imageData); */
-      
+  async function getImage() {
+    try {
+      const response = await api.get("/get_images");
 
+      setImages(response.data);
+    } catch (error: any) {
+      onOpen();
+      setShowError(JSON.stringify(error.response.data.messages ) || (error.response.data.message));
+    }
+  }
+  async function getImageById(id: number) {
+    try {
+      const response = await api.get(`/get_images/${id}`);
+      console.log(response.data);
+      setImageById(response.data);
+      openModal2();
+    } catch (error: any) {
+      onOpen();
+      setShowError(JSON.stringify(error.response.data.messages ) || (error.response.data.message));
+    }
+  }
 
-
-
-/* const imageBase64 = `data:image/*;base64, ${imageData.replaceAll('"','')}`; // a string com a imagem em base64
-
-// cria um blob a partir da imagem em base64
-const blob = new Blob([imageBase64], { type: "image/*" });
-
-
-// cria uma URL para o blob
-const imageUrl = URL.createObjectURL(blob); */
-
-
-
-
+  async function deleteImage(id: number) {
+    try {
+      const response = await api.delete(`/delete_image/${id}`);
+      console.log(response.data);
+      getImage()
+    } catch (error: any) {
+      onOpen();
+      setShowError(JSON.stringify(error.response.data.messages ) || (error.response.data.message));
+    }
+  }
 
   const handleFileInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -125,21 +125,18 @@ const imageUrl = URL.createObjectURL(blob); */
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     if (!selectedFile) return;
-
     const formData = new FormData();
     formData.append("image", selectedFile);
 
-    setFileName(selectedFile.name);
-
     try {
       const { data } = await api.post("/upload_image", formData);
-      console.log("Resposta do servidor:", data);
       setImages([...images, data]);
-    
+      setModalIsOpen(false);
+      getImage();
     } catch (error) {
-      console.error("Erro ao enviar imagem:", error);
+      setShowError("Erro ao enviar imagem: " + JSON.stringify(error));
+      
     }
   };
 
@@ -155,55 +152,26 @@ const imageUrl = URL.createObjectURL(blob); */
   function goBack() {
     navigate("/");
   }
+
   // Data carrossel
-  /* 
-  const fun = () => {
-    const te = testeImagens.map((testeImag)=> {
-      image: testeImag,
-      caption: = shdks
-    })
-  }
- */
-
-
-const dataImg  = [
-   images.map((image) => (
-    {
-      image: `data:image/*;base64,${image.data}`,
-      caption: `${image.filename}`, 
-    }
-  )),
-] 
- 
-
-
-/*   const dataImg = [
-    {
-      image: `${imageBase64}`,
-      caption: `${imageUrl}`,
-    },
-  
-  ]; */
+  const dataImg = images.map((image) => ({
+    image: `data:image/*;base64,${image.data}`,
+    caption: `${image.name} `,
+  }));
 
   const captionStyle = {
     fontSize: "2em",
-    fontWeight: "bold",
+    fontWeight: "bold", 
   };
   const slideNumberStyle = {
     fontSize: "20px",
     fontWeight: "bold",
   };
-  const data = React.useMemo(
-    () => images,
-    [
-      {
-        col4: "Bytes"
-      },
-      
-    ],
-    []
-  );
-    const columns = React.useMemo(
+  //@ts-ignore
+  const data = React.useMemo(() => images, [images]);
+
+  //Tabela
+  const columns = React.useMemo(
     () => [
       {
         Header: "Id",
@@ -226,19 +194,34 @@ const dataImg  = [
         Header: "Data de criação",
         accessor: "createdAt",
       },
-      {
-        Header: "Ações", 
-        accessor: "col4",
-      },
     ],
     []
   );
 
-  const tableInstance = useTable({ columns, data });
+  const tableHooks = (hooks: any) => {
+    hooks.visibleColumns.push((columns: any) => [
+      ...columns,
+      {
+        id: "Ações",
+        Header: "Ações",
+        Cell: ({ row }) => (
+          <div>
+          <button className ="ViewImage" onClick={() => getImageById(row.values.id)}>
+          </button> 
+          <button className="DeleteImage" onClick={() => deleteImage(row.values.id)}>
+          </button>
+          </div>
+        ),
+      },
+    ]);
+  };
+  //@ts-ignore
+  const tableInstance = useTable({ columns, data }, tableHooks);
 
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     tableInstance;
 
+   
   return (
     <Container>
       <header>
@@ -271,47 +254,44 @@ const dataImg  = [
         </button>
       </header>
 
-        
-      
-
       <div
         className="Carousel"
         style={{ display: toggleBtn ? "block" : "none" }}
       >
-        {images.map((image) => (
-        <img key={image.filename} src={`data:image/png;base64,${image.data}`} alt={image.filename} />
-      ))}
-
-
-           <Carousel
-          data={dataImg}
-          time={2000}
-          width="850px"
-          height="500px"
-          captionStyle={captionStyle}
-          radius="10px"
-          slideNumber={true}
-          slideNumberStyle={slideNumberStyle}
-          captionPosition="bottom"
-          automatic={true}
-          dots={true}
-          pauseIconColor="white"
-          pauseIconSize="40px"
-          slideBackgroundColor="darkgrey"
-          slideImageFit="cover"
-          thumbnails={true}
-          thumbnailWidth="100px"
-          style={{
-            textAlign: "center",
-            maxWidth: "850px",
-            maxHeight: "500px",
-            margin: "40px auto",
-          }}
-        /> 
+        {dataImg.length ? (
+          <Carousel
+            data={dataImg}
+            time={2000}
+            width="850px"
+            height="500px"
+            captionStyle={captionStyle}
+            radius="10px"
+            slideNumber={true}
+            slideNumberStyle={slideNumberStyle}
+            captionPosition="bottom"
+            automatic={true}
+            dots={true}
+            pauseIconColor="white"
+            pauseIconSize="40px"
+            slideBackgroundColor="darkgrey"
+            slideImageFit="cover"
+            thumbnails={true}
+            thumbnailWidth="100px"
+            style={{
+              textAlign: "center",
+              maxWidth: "850px",
+              maxHeight: "500px",
+              margin: "40px auto",
+            }}
+          />
+        ) : (
+          <h1> Faça uploads das suas imagens para vê-las aqui</h1>
+        )}
       </div>
 
       <div style={{ display: !toggleBtn ? "block" : "none" }}>
-                <table {...getTableProps()} style={{ border: "solid 1px #7D7D7D" }}>
+      {dataImg.length ?(
+        <table {...getTableProps()} style={{ border: "solid 1px #7D7D7D" }}>
           <thead>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
@@ -336,7 +316,7 @@ const dataImg  = [
             {rows.map((row) => {
               prepareRow(row);
               return (
-                <tr {...row.getRowProps()}> 
+                <tr {...row.getRowProps()}>
                   {row.cells.map((cell) => {
                     return (
                       <td
@@ -348,34 +328,31 @@ const dataImg  = [
                         }}
                       >
                         {cell.render("Cell")}
-                        
-                       </td>
-                      
+                      </td>
                     );
-                    
                   })}
-                       
                 </tr>
               );
             })}
-            
           </tbody>
-          
         </table>
+         ) : (
+          <h1> Você não possui imagens </h1>
+        )}
       </div>
 
       <ModalComponent isOpen={modalIsOpen} close={closeModal}>
         <Teste>
           <form name="image" onSubmit={handleSubmit}>
-            <fieldset className="fieldImage">
+            <fieldset className="fieldImage" onClick={() => document.querySelector('input')?.click()}>
               <input
-                type="file"
+                className="field-input"
+                type="file" 
                 name="image"
                 accept="image/*"
                 onChange={handleFileInputChange}
+                hidden
               />
-
-        
             </fieldset>
             <div className="ButtonsModal">
               <button type="submit" className="ModalButton">
@@ -393,8 +370,16 @@ const dataImg  = [
         </Teste>
       </ModalComponent>
 
+      <ModalComponent isOpen={modalIsOpen2} close={closeModal2}>
+        <Teste>
+          <img src={`data:image/*;base64,${imageById.map(image => image.data)}`} width={600} alt="Imagem" />
+          <button className="ModalButton" onClick={closeModal2} >Fechar</button>
+        </Teste>
+      </ModalComponent>
+
       <AlertDialog
         isOpen={isOpen}
+        //@ts-ignore
         leastDestructiveRef={cancelRef}
         onClose={onClose}
       >

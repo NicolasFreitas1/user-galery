@@ -29,7 +29,7 @@ export function Register() {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [showError, setShowError] = useState("");
-  const errorFixed = showError.replace(/"/g, '')
+  const errorFixed = showError
 
   async function handleRegister(event: any) {
     event.preventDefault();
@@ -49,8 +49,9 @@ export function Register() {
       console.log(token);
       navigate("/home");
     } catch (error: any) {
-      setShowError(JSON.stringify(error.response.data.message));
-      console.log(JSON.stringify(error.response.data.message));
+      console.log(error);
+      setShowError(JSON.stringify(error.response.data.messages) || (error.response.data.message));
+      console.log(JSON.stringify(error.response.data.messages)|| (error.response.data.message));
       onOpen();
     }
   }
@@ -91,6 +92,7 @@ export function Register() {
         </form>
         <AlertDialog
           isOpen={isOpen}
+          //@ts-ignore
           leastDestructiveRef={cancelRef}
           onClose={onClose}
         >
@@ -100,7 +102,7 @@ export function Register() {
                 Erro
               </AlertDialogHeader>
 
-              <AlertDialogBody>{errorFixed}</AlertDialogBody>
+              <AlertDialogBody>{showError}</AlertDialogBody>
 
               <AlertDialogFooter>
                 <Button colorScheme="red" onClick={onClose} ml={3}>
