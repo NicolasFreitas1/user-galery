@@ -52,8 +52,11 @@ export function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [result, setResult] = useState()
   const [images, setImages] = useState<Image[]>([]);
-  const [imageData, setImageData] = useState("");
+  const [imageData, setImageData] = useState<string>('');
+  const [imageUrl, setImageUrl] = useState<string>('');
 
+  const [imageSrc, setImageSrc] = useState(null);
+  
   const toggle = () => {
     setToggleBtn((prevState) => !prevState);
   };
@@ -68,38 +71,46 @@ export function Home() {
 useEffect(() => {
   async function getImage() {
     try {
-      const { data } = await api.get("/get_images");
-      console.log(data);
+      const response = await api.get('get_images');
       const token = localStorage.getItem("token");
       api.defaults.headers.authorization = `Bearer ${token}`;
+      setImages(response.data);
+    }
+    
+  
+    catch (error: any) {
+    /*       onOpen();
+    /*       setShowError(JSON.stringify(error.response.data.message));*/
+          console.log(JSON.stringify(error.response.data.message));  
+    }
+  }
+  getImage();
+}, []);
 
+    /*   setImageData(JSON.stringify(data));
+      const file = data.images.base64.split(',')[1];
+      console.log(file);
+      const url = URL.createObjectURL(await fetch(`data:image/png;base64,${file}`).then(res => res.blob()));
+      setImageUrl(url); */
   
 /*       const imageDataArray = data.map(image => image.data).toString();
       const imageDataJson = JSON.stringify(imageDataArray).replaceAll(/["]/g, '');
       setImageData(JSON.stringify(imageDataJson));
       console.log(imageDataJson);
       console.log(imageData); */
-      setImages(data)
       
 
-    } 
-    catch (error: any) {
-/*       onOpen();
-/*       setShowError(JSON.stringify(error.response.data.message));*/
-      console.log(JSON.stringify(error.response.data.message));  
-    }
-  }
-  getImage();
-}, []);
 
-const imageBase64 = `data:image/*;base64, ${imageData.replaceAll('"','')}`; // a string com a imagem em base64
+
+
+/* const imageBase64 = `data:image/*;base64, ${imageData.replaceAll('"','')}`; // a string com a imagem em base64
 
 // cria um blob a partir da imagem em base64
 const blob = new Blob([imageBase64], { type: "image/*" });
 
 
 // cria uma URL para o blob
-const imageUrl = URL.createObjectURL(blob);
+const imageUrl = URL.createObjectURL(blob); */
 
 
 
@@ -153,6 +164,18 @@ const imageUrl = URL.createObjectURL(blob);
     })
   }
  */
+
+
+const dataImg  = [
+   images.map((image) => (
+    {
+      image: `data:image/*;base64,${image.data}`,
+      caption: `${image.filename}`, 
+    }
+  )),
+] 
+ 
+
 
 /*   const dataImg = [
     {
@@ -255,8 +278,12 @@ const imageUrl = URL.createObjectURL(blob);
         className="Carousel"
         style={{ display: toggleBtn ? "block" : "none" }}
       >
-{/*         <img src={imageBase64} alt="Imagem" width={300} height={300} /> */}
-             {/* <Carousel
+        {images.map((image) => (
+        <img key={image.filename} src={`data:image/png;base64,${image.data}`} alt={image.filename} />
+      ))}
+
+
+           <Carousel
           data={dataImg}
           time={2000}
           width="850px"
@@ -280,7 +307,7 @@ const imageUrl = URL.createObjectURL(blob);
             maxHeight: "500px",
             margin: "40px auto",
           }}
-        /> */}
+        /> 
       </div>
 
       <div style={{ display: !toggleBtn ? "block" : "none" }}>
