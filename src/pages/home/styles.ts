@@ -8,10 +8,15 @@ import imageImput from "../../assets/imageImput.svg";
 import viewImage from "../../assets/olho.svg";
 import deleteImage from "../../assets/LixoImg.svg";
 
-export const Container = styled.div`
+interface ICAssorel {
+  toggled: boolean;
+}
+
+export const Container = styled.div<ICAssorel>`
   display: flex;
   align-items: center;
   flex-direction: column;
+  
 
   header {
     margin: 1%;
@@ -43,7 +48,16 @@ export const Container = styled.div`
     background-color: #f63f60;
     color: #fff;
   }
-  .buttons {
+  .Carousel {
+    display: ${({ toggled })=> toggled ? "flex" : "none"};
+  }
+  .AddImages{
+    display: ${({ toggled })=> !toggled ? "block" : "none"};
+  }
+  .tabelaImagens{
+    display: ${({ toggled })=> !toggled ? "block" : "none"};
+  }
+  .Buttons {
     flex-direction: row;
   }
   .ImgButton1 {
@@ -148,7 +162,7 @@ export const Container = styled.div`
   }
 `;
 
-export const Teste = styled.div`
+export const Box = styled.div`
     display: flex;
     justify-content: center;
     height: 100%;
@@ -185,7 +199,7 @@ export const Teste = styled.div`
     background-color: #F63F60;
     color: #FFF;
 }
-.ButtonsModal{
+.buttonsModal{
     margin-top: 1%;
     display: flex;
     flex-direction: row;

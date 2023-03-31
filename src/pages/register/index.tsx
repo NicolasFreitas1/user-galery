@@ -5,7 +5,6 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { Container } from "./styles";
 
-import teste111 from "../login/assets/teste111.jpg";
 import {
   AlertDialog,
   AlertDialogOverlay,
@@ -20,39 +19,44 @@ import ButtonSend from "../../components/ButtonSend";
 import Input from "../../components/Input";
 
 export function Register() {
+  const navigate = useNavigate();
+  
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef();
-
-  const navigate = useNavigate();
 
   const [name, setName] = useState("");
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [showError, setShowError] = useState("");
-  const errorFixed = showError
+
+  useEffect(() => {
+    verifyToken();
+  }, []);
+
+  async function verifyToken(){
+    const token = localStorage.getItem("token");
+    if(token){
+        navigate('/home');
+        api.defaults.headers.authorization = `Bearer ${token}`;
+    }
+  }
 
   async function handleRegister(event: any) {
     event.preventDefault();
 
     try {
-      const { data } = await api.post("/register", {
+      const { data } = await api.post("/user/register", {
         name,
         login,
         password,
       });
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("login", JSON.stringify(data.login));
-      localStorage.setItem("id", JSON.stringify(data.id));
-      console.log(data);
-      const token = localStorage.getItem("token");
-      api.defaults.headers.authorization = `Bearer ${token}`;
-      console.log(token);
+      const token = data.token
+      localStorage.setItem("token", token);
       navigate("/home");
     } catch (error: any) {
-      console.log(error);
-      setShowError(JSON.stringify(error.response.data.messages) || (error.response.data.message));
-      console.log(JSON.stringify(error.response.data.messages)|| (error.response.data.message));
       onOpen();
+      setShowError(error.response.data.messages || error.response.data.message);
+      
     }
   }
 
